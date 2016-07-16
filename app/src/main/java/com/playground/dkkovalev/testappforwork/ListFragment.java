@@ -69,7 +69,11 @@ public class ListFragment extends Fragment implements com.playground.dkkovalev.t
             presenter.attachView(this);
         }
 
-        grantPermission();
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
+            sendData();
+        } else {
+            grantPermission();
+        }
     }
 
     @Override
