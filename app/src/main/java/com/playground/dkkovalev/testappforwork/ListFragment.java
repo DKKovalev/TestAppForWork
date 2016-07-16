@@ -1,8 +1,10 @@
 package com.playground.dkkovalev.testappforwork;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -68,8 +70,6 @@ public class ListFragment extends Fragment implements com.playground.dkkovalev.t
         }
 
         grantPermission();
-
-        //sendData();
     }
 
     @Override
@@ -134,9 +134,10 @@ public class ListFragment extends Fragment implements com.playground.dkkovalev.t
                 } else {
                     presenter.showToast("Cannot send data");
                 }
-                return;
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void setupUI(View view) {
@@ -152,20 +153,14 @@ public class ListFragment extends Fragment implements com.playground.dkkovalev.t
 
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     private void grantPermission() {
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_PHONE_STATE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                    Manifest.permission.READ_PHONE_STATE)) {
-
-            } else {
-
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.READ_CONTACTS}, PERMISSION_REQUEST_READ_PHONE_STATE);
-            }
+        int hasPermission = getActivity().checkSelfPermission(Manifest.permission.READ_PHONE_STATE);
+        if (hasPermission != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_PHONE_STATE}, PERMISSION_REQUEST_READ_PHONE_STATE);
+            return;
         }
+        sendData();
     }
 
 
@@ -174,6 +169,7 @@ public class ListFragment extends Fragment implements com.playground.dkkovalev.t
         Info info = new Info();
         info.setMessage("Hello world");
         info.setUuid(telephonyManager.getDeviceId());
+
 
         presenter.sendInfo(info);
 
